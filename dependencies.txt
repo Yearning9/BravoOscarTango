@@ -1,0 +1,8 @@
+discord.py[voice]
+youtube-dl
+ffmpeg
+lyricsgenius
+covid
+flightradar24
+staticmap
+google_images_search
