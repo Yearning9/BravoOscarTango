@@ -1,6 +1,5 @@
 discord.py[voice]
 youtube-dl
-ffmpeg
 lyricsgenius
 covid
 flightradar24
