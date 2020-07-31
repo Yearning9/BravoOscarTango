@@ -78,6 +78,10 @@ class Fun(commands.Cog):
         await ctx.send(' ***ALL PRAISE OUR LORD AND SAVIOR VULING***  https://cdn.discordapp.com/attachments/680058574990475444/705384663903895564/EC-MBT_A320_Vueling_BCN.png')
 
     @commands.command()
+    async def md11(self, ctx):
+        await ctx.send('https://cdn.discordapp.com/attachments/689441452920537120/738870438406389840/Look_at_the_MD-11.mp4')
+
+    @commands.command()
     async def garloc(self, ctx):
         with open('Utils/messages.txt', 'r') as f:
             messages = [line.rstrip() for line in f]

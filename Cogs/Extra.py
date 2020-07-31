@@ -31,6 +31,7 @@ class Extra(commands.Cog):
                         value="[Google Images] Searches and posts a picture based on the given query", inline=False)
         embed.add_field(name='.vuling', value='To pray for our eternal god', inline=False)
         embed.add_field(name='.colonialism', value='Very unbiased command', inline=False)
+        embed.add_field(name='.md11', value='Another very unbiased command', inline=False)
         embed.add_field(name='.garloc',
                         value='Õ̷̗h̶̰̀ ̶̭̋m̷̥͌a̶̺͂n̷͓̊ ̵̫̒p̴̹͐ḻ̸̑s̷͈̋ ̷͍̾h̵̹̓e̴̻̽l̵̈́͜p̸̝̽ ̴̗̄w̷͇̐ĩ̸͇t̸͖̐h̸̗̀ ̴̜̀c̵̤̾o̷̢̚ṃ̴͝p̶̜̓u̵͜͠t̷̓͜e̷̗͆ŕ̶̩',
                         inline=False)
