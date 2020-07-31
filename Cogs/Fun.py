@@ -35,7 +35,7 @@ class Fun(commands.Cog):
         if text != 'None':
             if text == 'colonialism':
                 return await ctx.send(':(')
-            if len(text) <= 12:
+            if len(text) <= 11:
                 img = Image.open('Utils/vuling.jpg')
                 draw = ImageDraw.Draw(img)
                 font = ImageFont.truetype('./Utils/font.ttf', 50)
@@ -44,8 +44,17 @@ class Fun(commands.Cog):
                 img.save('Utils/vuling_out.jpg')
                 vuling_pic = discord.File('./Utils/vuling_out.jpg')
                 await ctx.send(file=vuling_pic)
+            elif len(text) > 11 and len(text) <= 20:
+                img = Image.open('Utils/vuling.jpg')
+                draw = ImageDraw.Draw(img)
+                font = ImageFont.truetype('./Utils/font.ttf', 50)
+                draw.text((175, 0), 'Vuling loves\n ' + text, (116, 116, 116), font=font)
+                draw.text((15, 450), 'Because Vuling loves everybody ♥', (116, 116, 116), font=font)
+                img.save('Utils/vuling_out.jpg')
+                vuling_pic = discord.File('./Utils/vuling_out.jpg')
+                await ctx.send(file=vuling_pic)
             else:
-                await ctx.send('Text is too long, max 12 characters')
+                await ctx.send('Text is too long, max 20 characters')
         else:
             await ctx.send('You need to specify some text!')
 
