@@ -5,4 +5,4 @@ covid
 flightradar24
 staticmap
 google_images_search
-defusedxml (for safety reasons)
+defusedxml 
