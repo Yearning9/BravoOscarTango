@@ -48,7 +48,7 @@ class Fun(commands.Cog):
                 img = Image.open('Utils/vuling.jpg')
                 draw = ImageDraw.Draw(img)
                 font = ImageFont.truetype('./Utils/font.ttf', 50)
-                draw.text((175, 0), 'Vuling loves\n ' + text, (116, 116, 116), font=font)
+                draw.text((175, 0), 'Vuling loves\n' + text, (116, 116, 116), font=font)
                 draw.text((15, 450), 'Because Vuling loves everybody ♥', (116, 116, 116), font=font)
                 img.save('Utils/vuling_out.jpg')
                 vuling_pic = discord.File('./Utils/vuling_out.jpg')
