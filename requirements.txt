@@ -6,3 +6,5 @@ flightradar24
 staticmap
 google_images_search
 defusedxml 
+markovbot
+zalgo_text
