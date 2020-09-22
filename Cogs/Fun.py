@@ -3,11 +3,22 @@ import requests
 import json
 import discord
 import os
+from zalgo_text import zalgo
+from markovbot import MarkovBot
 from pathlib import Path
 from discord.ext import commands
 import google_images_search
 from discord.ext.commands import MissingRequiredArgument
 from PIL import Image, ImageDraw, ImageFont
+
+funbot = MarkovBot()
+
+dirname = os.path.dirname(os.path.abspath(__file__))
+
+
+
+book = os.path.join(dirname, u'Freud_Dream_Psychology.txt')
+
 
 with open('Private/Gis1.txt', 'r') as q:
     gis1: str = q.read()
@@ -28,6 +39,17 @@ class Fun(commands.Cog):
     def __init__(self, client):
         self.client = client
 
+
+    @commands.command(aliases=['mk'])
+    async def markov(self, ctx):
+        funbot.read(book)
+        n = random.randint(2, 40)
+        text = funbot.generate_text(n)
+        await ctx.send(text)
+
+    @commands.command(aliases=['z'])
+    async def zalgo(self, ctx, *, text: str):
+        await ctx.send(zalgo.zalgo().zalgofy(text))
 
     @commands.command()
     async def pray(self, ctx, *, text: str = 'None'):
