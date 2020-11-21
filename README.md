@@ -3,5 +3,5 @@ Discord bot with:
 - Moderation
 - Music 
 - Fun
-- FlightRadar24 integration
+- FlightRadar24 Integration (not working)
 - Covid info
