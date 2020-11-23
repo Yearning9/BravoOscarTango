@@ -35,8 +35,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
         'nocheckcertificate': True,
         'ignoreerrors': False,
         'logtostderr': False,
-        'quiet': True,
-        'no_warnings': True,
+        'quiet': False,
+        'no_warnings': False,
         'default_search': 'auto',
         'source_address': '0.0.0.0',
     }
@@ -327,7 +327,7 @@ class Music(commands.Cog):
     @commands.command(aliases=['pause', 'pp'])
     async def _pause(self, ctx: commands.Context):
 
-        if ctx.voice_state.is_playing and ctx.voice_state.voice.is_playing():
+        if ctx.voice_state.is_playing or ctx.voice_state.voice.is_playing():
             ctx.voice_state.voice.pause()
             await ctx.send('Paused :pause_button:')
 
@@ -422,27 +422,33 @@ class Music(commands.Cog):
                 await ctx.send('Enqueued {}'.format(str(source)))
 
     @commands.command(aliases=['ly'])
-    async def lyrics(self, ctx: commands.Context):
+    async def lyrics(self, ctx: commands.Context, *, typed="are you retarded"):
         global sauce
+
+        lysauce = sauce
+
+        if typed != "are you retarded":
+            lysauce = typed
 
         if not ctx.voice_state.is_playing:
             return await ctx.send('Nothing being played at the moment.')
 
+
         else:
             try:
-                song = genius.search_song(sauce)
-                lyrics_embed = discord.Embed(
-                    title='Lyrics for **{}**'.format(sauce),
-                    description=song.lyrics,
-                    colour=discord.Colour.from_rgb(97, 0, 215)
-                    )
-                lyrics_embed.set_footer(text='Lyrics by Genius.com')
-                lyrics_embed.set_thumbnail(
-                    url='https://cdn.discordapp.com/attachments/356779184393158657/729351510974267513/plane-travel-icon-rebound2.gif')
-                await ctx.send(embed=lyrics_embed)
+                async with ctx.typing():
+                    song = genius.search_song(lysauce)
+                    lyrics_embed = discord.Embed(
+                        title='Lyrics for **{}**'.format(lysauce),
+                        description=song.lyrics,
+                        colour=discord.Colour.from_rgb(97, 0, 215)
+                        )
+                    lyrics_embed.set_footer(text='Lyrics by Genius.com')
+                    lyrics_embed.set_thumbnail(
+                        url='https://cdn.discordapp.com/attachments/356779184393158657/729351510974267513/plane-travel-icon-rebound2.gif')
+                    await ctx.send(embed=lyrics_embed)
             except AttributeError:
-                await ctx.send('Could not find a match for {}'.format(sauce))
-                print('Same error')
+                await ctx.send('Could not find a match for {}'.format(lysauce))
 
     @_join.before_invoke
     @_play.before_invoke
