@@ -10,7 +10,10 @@ from staticmap import StaticMap, CircleMarker, IconMarker
 
 # osapi = OpenSkyApi()
 # fr = flightradar24.Api()
-hdr = {"X-API-Key": "18dde535ef6246079565334706"}
+
+with open('Private/WxAPI.txt', 'r') as x:
+    xapi: str = x.read()
+hdr = {"X-API-Key": xapi}
 
 
 class Flights(commands.Cog):
