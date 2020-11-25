@@ -1,11 +1,16 @@
 from discord.ext import commands
+import requests
+# from opensky_api import OpenSkyApi
 import discord
-import flightradar24
+# import flightradar24
 import json
-from datetime import datetime
-from staticmap import StaticMap, Line, IconMarker, CircleMarker
 
-#fr = flightradar24.Api()
+# from datetime import datetime
+from staticmap import StaticMap, CircleMarker, IconMarker
+
+# osapi = OpenSkyApi()
+# fr = flightradar24.Api()
+hdr = {"X-API-Key": "18dde535ef6246079565334706"}
 
 
 class Flights(commands.Cog):
@@ -13,10 +18,130 @@ class Flights(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(aliases=['ff'])
-    async def flight(self, ctx):  # add flight_id after ctx
+    @commands.command(aliases=["wx"])
+    async def metar(self, ctx, icao: str):
+        req = requests.get('https://api.checkwx.com/metar/{}/decoded'.format(icao), headers=hdr)
 
-        await ctx.send("Unfortunately FlightRadar24 integration is no more available")
+        icao = icao.upper()
+        print("Requested METAR for {}".format(icao))
+
+        try:
+            req.raise_for_status()
+            resp = json.loads(req.text)
+
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            await ctx.send('Error occured:{}'.format(e))
+            return
+
+        if resp["results"] == 0:
+            await ctx.send("No results, please check for typos or try a different ICAO")
+            return
+
+        layerint = len(resp["data"][0]["clouds"])       # integer for number of cloud layers
+        wxint = len(resp["data"][0]["conditions"])      # presence of wx conditions
+        visbool = "visibility" in resp["data"][0]       # presence of vis data
+        gustbool = "gust_kts" in resp["data"][0]["wind"]  # presence of gusts
+
+        name = resp["data"][0]["station"]["name"]
+        degrees = resp["data"][0]["wind"]["degrees"]
+        speed = resp["data"][0]["wind"]["speed_kts"]
+        temp = resp["data"][0]["temperature"]["celsius"]
+        dew = resp["data"][0]["dewpoint"]["celsius"]
+        humidity = resp["data"][0]["humidity"]["percent"]
+        inhg = resp["data"][0]["barometer"]["hg"]
+        hpa = resp["data"][0]["barometer"]["hpa"]
+        obs = resp["data"][0]["observed"]
+        cond = resp["data"][0]["flight_category"]
+        raw = resp["data"][0]["raw_text"]
+
+
+        points = []
+
+        lat: float = resp["data"][0]["location"]["coordinates"][1]
+        long: float = resp["data"][0]["location"]["coordinates"][0]
+
+        print(lat, long)
+
+        points.append(tuple([lat, long]))
+
+        marker_outline = CircleMarker((long, lat), 'white', 18)
+        marker = CircleMarker((long, lat), '#0036FF', 12)
+        icon_flag = IconMarker((long, lat), './Utils/icon-flag.png', 12, 32)
+
+        m = StaticMap(700, 300, 10, 10)
+        m.add_marker(marker_outline)
+        m.add_marker(marker)
+        m.add_marker(icon_flag)
+
+        image = m.render(zoom=8)
+        image.save('Utils/metar.png')
+        file = discord.File('Utils/metar.png')
+
+
+        metar = discord.Embed(
+            title="Requested METAR for {} - {}".format(icao, name),
+            description="Raw: {}".format(raw),
+            colour=discord.Colour.from_rgb(97, 0, 215)
+        )
+        if not gustbool:
+            metar.add_field(name="Wind:", value="{}° at {} kts".format(degrees, speed))
+        else:
+            gust = resp["data"][0]["wind"]["gust_kts"]
+            metar.add_field(name="Wind:", value="{}° at {} kts, gusts {} kts".format(degrees, speed, gust))
+        metar.add_field(name="Temp/Dewpoint:", value="{}°C/ {}°C".format(temp, dew))
+        metar.add_field(name="Altimeter:", value="{} hPa/ {} inHg".format(hpa, inhg))
+        if visbool:
+            vismil = resp["data"][0]["visibility"]["miles"]
+            vismet = resp["data"][0]["visibility"]["meters"]
+            metar.add_field(name="Visibility:", value="{} meters/ {} miles".format(vismet, vismil))
+        metar.add_field(name="Humidity:", value="{}%".format(humidity))
+        metar.set_thumbnail(
+            url="https://cdn.discordapp.com/attachments/356779184393158657/729351510974267513/plane-travel-icon-rebound2.gif")
+        metar.set_footer(text="Observed at {}. Flight category: {}".format(obs, cond))
+        if wxint > 0:
+            weather = resp["data"][0]["conditions"][0]["text"]
+            metar.add_field(name="Weather condition:", value="{}".format(weather))
+
+        if layerint == 1:
+            clouds = resp["data"][0]["clouds"][0]["text"]
+            clofeet = resp["data"][0]["clouds"][0]["feet"]
+            metar.add_field(name="Cloud condition:", value="{}ft {}".format(clofeet, clouds))
+        elif layerint == 2:
+            clouds = resp["data"][0]["clouds"][0]["text"]
+            clofeet = resp["data"][0]["clouds"][0]["feet"]
+            clouds1 = resp["data"][0]["clouds"][1]["text"]
+            clofeet1 = resp["data"][0]["clouds"][1]["feet"]
+            metar.add_field(name="Cloud condition:",
+                            value="{}ft {}/ {}ft {}".format(clofeet, clouds, clofeet1, clouds1))
+        elif layerint == 3:
+            clouds = resp["data"][0]["clouds"][0]["text"]
+            clofeet = resp["data"][0]["clouds"][0]["feet"]
+            clouds1 = resp["data"][0]["clouds"][1]["text"]
+            clofeet1 = resp["data"][0]["clouds"][1]["feet"]
+            clouds2 = resp["data"][0]["clouds"][2]["text"]
+            clofeet2 = resp["data"][0]["clouds"][2]["feet"]
+            metar.add_field(name="Cloud condition:",
+                            value="{}ft {}/ {}ft {}/ {}ft {}".format(clofeet, clouds, clofeet1, clouds1, clofeet2, clouds2))
+        elif layerint == 0:
+            metar.add_field(name="Cloud condition:", value="None/ Not Specified")
+
+        metar.set_image(url='attachment://metar.png')
+
+        await ctx.send(embed=metar, file=file)
+
+    # @commands.command()
+    # async def flight(self, ctx):
+    #     states = osapi.get_states()
+    #     print(states)
+    #     flight_data = json.loads(states)
+    #     print(flight_data)
+    #     await ctx.send('Saved flights as json')
+
+    @commands.command(aliases=['ff'])
+    async def fr24(self, ctx):  # add flight_id after ctx
+
+        await ctx.send("Unfortunately FlightRadar24 integration is not available anymore")
 
         # flight = fr.get_flight(flight_id)
         #
