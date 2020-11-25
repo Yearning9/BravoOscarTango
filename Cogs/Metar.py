@@ -14,7 +14,7 @@ urllib3.disable_warnings()
 class Metar(commands.Cog):
         def __init__(self, client):
                 self.client = client
-        @commands.command(aliases=['metar'])
+        @commands.command(aliases=['metar1'])
         async def metars(self, ctx, airportul, time='1', page: int = 1):
                 airport = str.lower(airportul)
                 response = http.request('GET', 'https://aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=csv&stationString=' + airport + '&hoursBeforeNow=' + time)
