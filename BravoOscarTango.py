@@ -41,7 +41,7 @@ prfx = '.'
 @client.event
 async def on_ready():
     await client.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.competing, name='retard championship (.commands)'))
+        activity=discord.Activity(type=discord.ActivityType.competing, name='flight simming (.commands)'))
     print('Bot is ready')
 
 
