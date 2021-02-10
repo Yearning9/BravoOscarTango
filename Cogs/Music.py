@@ -8,6 +8,7 @@ import discord
 import youtube_dl
 from async_timeout import timeout
 from discord.ext import commands
+import json
 
 genius = lyricsgenius.Genius("r_eahP4j5tNj34CGAI48kSVYCHyJ0YCCDG70kmmHrVnYElyuqjnULP0lk9tvxKlT")
 
@@ -15,6 +16,14 @@ sauce = ''
 
 youtube_dl.utils.bug_reports_message = lambda: ''
 
+def guild_prefix(client, message):
+    with open('Private/prefixes.json', 'r') as f:
+        prefixes = json.load(f)
+
+    return prefixes[str(message.guild.id)]
+
+
+prfx = guild_prefix
 
 class VoiceError(Exception):
     pass
@@ -35,7 +44,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         'nocheckcertificate': True,
         'ignoreerrors': False,
         'logtostderr': False,
-        'quiet': False,
+        'quiet': True,
         'no_warnings': False,
         'default_search': 'auto',
         'source_address': '0.0.0.0',
@@ -146,7 +155,7 @@ class Song:
             title='Now playing: {}'.format(self.source.title),
             color=discord.Color.from_rgb(97, 0, 215)
         )
-                 .set_footer(text='Commands at .music')
+                 .set_footer(text=f'Commands at {prfx}music')
                  .add_field(name='Duration', value=self.source.duration)
                  .add_field(name='Requested by', value=self.requester.mention)
                  .add_field(name='Uploader', value=self.source.uploader)
@@ -307,36 +316,36 @@ class Music(commands.Cog):
             return
 
         ctx.voice_state.voice = await destination.connect()
-        await ctx.send(f'Connected to {destination}')
+        await ctx.reply(f'Connected to {destination}', mention_author=False)
 
     @commands.command(name='leave', aliases=['l'])
     async def _leave(self, ctx: commands.Context):
 
         if not ctx.voice_state.voice:
-            return await ctx.send('Not connected to any voice channel.')
+            return await ctx.reply('Not connected to any voice channel.', mention_author=False)
 
         await ctx.voice_state.stop()
-        await ctx.send('Disconnected')
+        await ctx.reply('Disconnected', mention_author=False)
         del self.voice_states[ctx.guild.id]
 
     @commands.command(aliases=['np'])
     async def _np(self, ctx: commands.Context):
 
-        await ctx.send(embed=ctx.voice_state.current.create_embed())
+        await ctx.reply(embed=ctx.voice_state.current.create_embed(), mention_author=False)
 
     @commands.command(aliases=['pause', 'pp'])
     async def _pause(self, ctx: commands.Context):
 
         if ctx.voice_state.is_playing or ctx.voice_state.voice.is_playing():
             ctx.voice_state.voice.pause()
-            await ctx.send('Paused :pause_button:')
+            await ctx.reply('Paused :pause_button:', mention_author=False)
 
     @commands.command(aliases=['resume', 'r'])
     async def _resume(self, ctx: commands.Context):
 
         if ctx.voice_state.is_playing and ctx.voice_state.voice.is_paused():
             ctx.voice_state.voice.resume()
-            await ctx.send('Resumed :arrow_forward:')
+            await ctx.reply('Resumed :arrow_forward:', mention_author=False)
 
     @commands.command(aliases=['stop'])
     async def _stop(self, ctx: commands.Context):
@@ -345,22 +354,22 @@ class Music(commands.Cog):
 
         if ctx.voice_state.is_playing:
             ctx.voice_state.voice.stop()
-            await ctx.send('Stopped ⏹. Queue has been cleared')
+            await ctx.reply('Stopped ⏹. Queue has been cleared', mention_author=False)
 
     @commands.command(aliases=['skip'])
     async def _skip(self, ctx: commands.Context):
 
         if not ctx.voice_state.is_playing:
-            return await ctx.send('Not playing any music right now...')
+            return await ctx.reply('Not playing any music right now...', mention_author=False)
 
         ctx.voice_state.skip()
-        await ctx.send('Skipped song :fast_forward:')
+        await ctx.reply('Skipped song :fast_forward:', mention_author=False)
 
     @commands.command(aliases=['queue'])
     async def _queue(self, ctx: commands.Context, *, page: int = 1):
 
         if len(ctx.voice_state.songs) == 0:
-            return await ctx.send('Empty queue.')
+            return await ctx.reply('Empty queue', mention_author=False)
 
         items_per_page = 10
         pages = math.ceil(len(ctx.voice_state.songs) / items_per_page)
@@ -374,35 +383,35 @@ class Music(commands.Cog):
 
         embed = (discord.Embed(description='**{} tracks:**\n\n{}'.format(len(ctx.voice_state.songs), queue))
                  .set_footer(text='Viewing page {}/{}'.format(page, pages)))
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
 
     @commands.command(aliases=['shuffle'])
     async def _shuffle(self, ctx: commands.Context):
 
         if len(ctx.voice_state.songs) == 0:
-            return await ctx.send('Empty queue.')
+            return await ctx.reply('Empty queue', mention_author=False)
 
         ctx.voice_state.songs.shuffle()
-        await ctx.send('Queue has been shuffled :twisted_rightwards_arrows:')
+        await ctx.reply('Queue has been shuffled :twisted_rightwards_arrows:', mention_author=False)
 
     @commands.command(aliases=['remove'])
     async def _remove(self, ctx: commands.Context, index: int):
 
         if len(ctx.voice_state.songs) == 0:
-            return await ctx.send('Empty queue.')
+            return await ctx.reply('Empty queue', mention_author=False)
 
         ctx.voice_state.songs.remove(index - 1)
-        await ctx.send('Song has been removed')
+        await ctx.reply('Song has been removed', mention_author=False)
 
     @commands.command(aliases=['loop'])
     async def _loop(self, ctx: commands.Context):
 
         if not ctx.voice_state.is_playing:
-            return await ctx.send('Nothing being played at the moment.')
+            return await ctx.reply('Nothing being played at the moment', mention_author=False)
 
         # Inverse boolean value to loop and unloop.
         ctx.voice_state.loop = not ctx.voice_state.loop
-        await ctx.send('Song has been looped/unlooped :repeat_one:')
+        await ctx.reply('Song has been looped/unlooped :repeat_one:', mention_author=False)
 
     @commands.command(aliases=['p', 'play'])
     async def _play(self, ctx: commands.Context, *, search: str):
@@ -419,7 +428,7 @@ class Music(commands.Cog):
                 song = Song(source)
 
                 await ctx.voice_state.songs.put(song)
-                await ctx.send('Enqueued {}'.format(str(source)))
+                await ctx.reply('Enqueued {}'.format(str(source)), mention_author=False)
 
     @commands.command(aliases=['ly'])
     async def lyrics(self, ctx: commands.Context, *, typed="are you retarded"):
@@ -431,7 +440,7 @@ class Music(commands.Cog):
             lysauce = typed
 
         if not ctx.voice_state.is_playing:
-            return await ctx.send('Nothing being played at the moment.')
+            return await ctx.reply('Nothing being played at the moment.', mention_author=False)
 
 
         else:
@@ -446,9 +455,9 @@ class Music(commands.Cog):
                     lyrics_embed.set_footer(text='Lyrics by Genius.com')
                     lyrics_embed.set_thumbnail(
                         url='https://cdn.discordapp.com/attachments/356779184393158657/729351510974267513/plane-travel-icon-rebound2.gif')
-                    await ctx.send(embed=lyrics_embed)
+                    await ctx.reply(embed=lyrics_embed, mention_author=False)
             except AttributeError:
-                await ctx.send('Could not find a match for {}'.format(lysauce))
+                await ctx.reply('Could not find a match for {}'.format(lysauce), mention_author=False)
 
     @_join.before_invoke
     @_play.before_invoke

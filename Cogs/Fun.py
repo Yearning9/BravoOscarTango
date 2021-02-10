@@ -8,7 +8,7 @@ from markovbot import MarkovBot
 from pathlib import Path
 from discord.ext import commands
 import google_images_search
-from discord.ext.commands import MissingRequiredArgument
+from discord.ext.commands import MissingRequiredArgument, CommandOnCooldown
 from PIL import Image, ImageDraw, ImageFont
 
 funbot = MarkovBot()
@@ -17,7 +17,7 @@ dirname = os.path.dirname(os.path.abspath(__file__))
 
 
 
-book = os.path.join(dirname, u'Freud_Dream_Psychology.txt')
+book = os.path.join(dirname, u'../Utils/manifesto.txt')
 
 
 with open('Private/Gis1.txt', 'r') as q:
@@ -55,7 +55,7 @@ class Fun(commands.Cog):
     async def pray(self, ctx, *, text: str = 'None'):
 
         if text != 'None':
-            if text == 'colonialism':
+            if text.lower() == 'colonialism':
                 return await ctx.send(':(')
             if len(text) <= 11:
                 img = Image.open('Utils/vuling.jpg')
@@ -66,7 +66,7 @@ class Fun(commands.Cog):
                 img.save('Utils/vuling_out.jpg')
                 vuling_pic = discord.File('./Utils/vuling_out.jpg')
                 await ctx.send(file=vuling_pic)
-            elif len(text) > 11 and len(text) <= 20:
+            elif 11 < len(text) <= 20:
                 img = Image.open('Utils/vuling.jpg')
                 draw = ImageDraw.Draw(img)
                 font = ImageFont.truetype('./Utils/font.ttf', 50)
@@ -76,12 +76,13 @@ class Fun(commands.Cog):
                 vuling_pic = discord.File('./Utils/vuling_out.jpg')
                 await ctx.send(file=vuling_pic)
             else:
-                await ctx.send('Text is too long, max 20 characters')
+                await ctx.reply('Text is too long, max 20 characters', mention_author=False)
         else:
-            await ctx.send('You need to specify some text!')
+            await ctx.reply('You need to specify some text!', mention_author=False)
 
 
-    @commands.command()                          # seems to fail with too many requests, probably need to add a timer for the command to prevent that
+    @commands.command()
+    @commands.cooldown(1, 5)
     async def pic(self, ctx, *, image_query):
         async with ctx.typing():
             if os.path.exists('./Utils/image.jpg'):
@@ -91,17 +92,17 @@ class Fun(commands.Cog):
             image = discord.File('Utils/image.jpg')
             size = Path('Utils/image.jpg').stat().st_size
             if size > 8388119:
-                return await ctx.send('Image is too big for Discord! Try a different search')
+                return await ctx.reply('Image is too big for Discord! Try a different search', mention_author=False)
 
-            await ctx.send(file=image)
+            await ctx.reply(file=image, mention_author=False)
 
     @commands.command()
     async def vuling(self, ctx):
-        await ctx.send(' ***ALL PRAISE OUR LORD AND SAVIOR VULING***  https://cdn.discordapp.com/attachments/680058574990475444/705384663903895564/EC-MBT_A320_Vueling_BCN.png')
+        await ctx.reply('***ALL PRAISE OUR LORD AND SAVIOR VULING***  https://cdn.discordapp.com/attachments/680058574990475444/705384663903895564/EC-MBT_A320_Vueling_BCN.png', mention_author=False)
 
     @commands.command()
     async def md11(self, ctx):
-        await ctx.send('https://cdn.discordapp.com/attachments/689441452920537120/738870438406389840/Look_at_the_MD-11.mp4')
+        await ctx.reply('https://cdn.discordapp.com/attachments/689441452920537120/738870438406389840/Look_at_the_MD-11.mp4', mention_author=False)
 
     @commands.command()
     async def garloc(self, ctx):
@@ -111,7 +112,7 @@ class Fun(commands.Cog):
 
     @commands.command()
     async def colonialism(self, ctx):
-        await ctx.send('https://media.discordapp.net/attachments/696375145127739442/737247675912552458/KAPPA3041327.jpg')
+        await ctx.reply('https://media.discordapp.net/attachments/696375145127739442/737247675912552458/KAPPA3041327.jpg', mention_author=False)
 
     @commands.command(aliases=['g'])
     async def gif(self, ctx, *, search_term):
@@ -120,20 +121,21 @@ class Fun(commands.Cog):
         if r.status_code == 200:
             gifs = json.loads(r.content)
             url = gifs["results"][0]["url"]
-            await ctx.send(url)
+            await ctx.reply(url, mention_author=False)
         else:
-            await ctx.send("Couldn't find a GIF")
+            await ctx.reply("Couldn't find a GIF", mention_author=False)
 
     @gif.error
     async def gif_error(self, ctx, error):
         if isinstance(error, MissingRequiredArgument):
-            await ctx.send('https://cdn.discordapp.com/attachments/356779184393158657/737319352654757888/ezgif.com-optimize.gif')
+            await ctx.reply('https://cdn.discordapp.com/attachments/356779184393158657/737319352654757888/ezgif.com-optimize.gif', mention_author=False)
 
     @pic.error
     async def pic_error(self, ctx, error):
         if isinstance(error, MissingRequiredArgument):
-            await ctx.send('You need to specify an image to search')
-
+            await ctx.reply('You need to specify an image to search', mention_author=False)
+        if isinstance(error, CommandOnCooldown):
+            await ctx.reply('Command on cooldown, please wait a few seconds', mention_author=False)
 
 def setup(client):
     client.add_cog(Fun(client))

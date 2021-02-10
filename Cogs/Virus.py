@@ -4,8 +4,6 @@ from discord.ext import commands
 
 covid = Covid()
 
-
-
 class Virus(commands.Cog):
 
     def __init__(self, client):
@@ -36,7 +34,7 @@ class Virus(commands.Cog):
             vembed.add_field(name='Total deaths', value=country_high_deaths)
             vembed.set_footer(text='Data from John Hopkins University')
 
-            await ctx.send(embed=vembed)
+            await ctx.reply(embed=vembed, mention_author=False)
 
         else:
             virus_country = covid.get_status_by_country_name(country)
@@ -59,7 +57,7 @@ class Virus(commands.Cog):
             vembed1.add_field(name='Total deaths', value=country_deaths)
             vembed1.set_footer(text='Data from John Hopkins University')
 
-            await ctx.send(embed=vembed1)
+            await ctx.reply(embed=vembed1, mention_author=False)
 
 
 def setup(client):
