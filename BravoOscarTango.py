@@ -132,7 +132,7 @@ async def afk(ctx):
 
 @client.command()
 async def invite(ctx):
-    await ctx.reply('Invite for WonderfulBot: https://discord.com/api/oauth2/authorize?client_id=728998963054903388&permissions=0&scope=bot')
+    await ctx.reply('Invite for BravoOscarTango: https://discord.com/api/oauth2/authorize?client_id=728998963054903388&permissions=0&scope=bot')
 
 @client.event
 async def on_message(message):
