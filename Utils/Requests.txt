@@ -1,5 +1,0 @@
-Yearning9#4161 = <MSFS2020>
-PilotSchnitzler#9552 = <Bn-2>
-Deissek/Jan#2986 = <https://store.x-plane.org/HEGN--Hurghada-International-Airport_p_1264.html>
-Deissek/Jan#2986 = <https://store.x-plane.org/FA-Tensor-600X-Project--VSKYLABS-Test-Pilot-_p_1260.html>
-PilotSchnitzler#9552 = <Avia71 Aerostar 601P>
