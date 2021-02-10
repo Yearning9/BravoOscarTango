@@ -51,34 +51,34 @@ class Fun(commands.Cog):
     async def zalgo(self, ctx, *, text: str):
         await ctx.send(zalgo.zalgo().zalgofy(text))
 
-    @commands.command()
-    async def pray(self, ctx, *, text: str = 'None'):
-
-        if text != 'None':
-            if text.lower() == 'colonialism':
-                return await ctx.send(':(')
-            if len(text) <= 11:
-                img = Image.open('Utils/vuling.jpg')
-                draw = ImageDraw.Draw(img)
-                font = ImageFont.truetype('./Utils/font.ttf', 50)
-                draw.text((175, 0), 'Vuling loves ' + text, (116, 116, 116), font=font)
-                draw.text((15, 450), 'Because Vuling loves everybody ♥', (116, 116, 116), font=font)
-                img.save('Utils/vuling_out.jpg')
-                vuling_pic = discord.File('./Utils/vuling_out.jpg')
-                await ctx.send(file=vuling_pic)
-            elif 11 < len(text) <= 20:
-                img = Image.open('Utils/vuling.jpg')
-                draw = ImageDraw.Draw(img)
-                font = ImageFont.truetype('./Utils/font.ttf', 50)
-                draw.text((175, 0), 'Vuling loves\n' + text, (116, 116, 116), font=font)
-                draw.text((15, 450), 'Because Vuling loves everybody ♥', (116, 116, 116), font=font)
-                img.save('Utils/vuling_out.jpg')
-                vuling_pic = discord.File('./Utils/vuling_out.jpg')
-                await ctx.send(file=vuling_pic)
-            else:
-                await ctx.reply('Text is too long, max 20 characters', mention_author=False)
-        else:
-            await ctx.reply('You need to specify some text!', mention_author=False)
+    # @commands.command()
+    # async def pray(self, ctx, *, text: str = 'None'):
+    #
+    #     if text != 'None':
+    #         if text.lower() == 'colonialism':
+    #             return await ctx.send(':(')
+    #         if len(text) <= 11:
+    #             img = Image.open('Utils/vuling.jpg')
+    #             draw = ImageDraw.Draw(img)
+    #             font = ImageFont.truetype('./Utils/font.ttf', 50)
+    #             draw.text((175, 0), 'Vuling loves ' + text, (116, 116, 116), font=font)
+    #             draw.text((15, 450), 'Because Vuling loves everybody ♥', (116, 116, 116), font=font)
+    #             img.save('Utils/vuling_out.jpg')
+    #             vuling_pic = discord.File('./Utils/vuling_out.jpg')
+    #             await ctx.send(file=vuling_pic)
+    #         elif 11 < len(text) <= 20:
+    #             img = Image.open('Utils/vuling.jpg')
+    #             draw = ImageDraw.Draw(img)
+    #             font = ImageFont.truetype('./Utils/font.ttf', 50)
+    #             draw.text((175, 0), 'Vuling loves\n' + text, (116, 116, 116), font=font)
+    #             draw.text((15, 450), 'Because Vuling loves everybody ♥', (116, 116, 116), font=font)
+    #             img.save('Utils/vuling_out.jpg')
+    #             vuling_pic = discord.File('./Utils/vuling_out.jpg')
+    #             await ctx.send(file=vuling_pic)
+    #         else:
+    #             await ctx.reply('Text is too long, max 20 characters', mention_author=False)
+    #     else:
+    #         await ctx.reply('You need to specify some text!', mention_author=False)
 
 
     @commands.command()
@@ -96,13 +96,13 @@ class Fun(commands.Cog):
 
             await ctx.reply(file=image, mention_author=False)
 
-    @commands.command()
-    async def vuling(self, ctx):
-        await ctx.reply('***ALL PRAISE OUR LORD AND SAVIOR VULING***  https://cdn.discordapp.com/attachments/680058574990475444/705384663903895564/EC-MBT_A320_Vueling_BCN.png', mention_author=False)
-
-    @commands.command()
-    async def md11(self, ctx):
-        await ctx.reply('https://cdn.discordapp.com/attachments/689441452920537120/738870438406389840/Look_at_the_MD-11.mp4', mention_author=False)
+    # @commands.command()
+    # async def vuling(self, ctx):
+    #     await ctx.reply('***ALL PRAISE OUR LORD AND SAVIOR VULING***  https://cdn.discordapp.com/attachments/680058574990475444/705384663903895564/EC-MBT_A320_Vueling_BCN.png', mention_author=False)
+    #
+    # @commands.command()
+    # async def md11(self, ctx):
+    #     await ctx.reply('https://cdn.discordapp.com/attachments/689441452920537120/738870438406389840/Look_at_the_MD-11.mp4', mention_author=False)
 
     @commands.command()
     async def garloc(self, ctx):
@@ -110,9 +110,9 @@ class Fun(commands.Cog):
             messages = [line.rstrip() for line in f]
         await ctx.channel.send(f'{random.choice(messages)}')
 
-    @commands.command()
-    async def colonialism(self, ctx):
-        await ctx.reply('https://media.discordapp.net/attachments/696375145127739442/737247675912552458/KAPPA3041327.jpg', mention_author=False)
+    # @commands.command()
+    # async def colonialism(self, ctx):
+    #     await ctx.reply('https://media.discordapp.net/attachments/696375145127739442/737247675912552458/KAPPA3041327.jpg', mention_author=False)
 
     @commands.command(aliases=['g'])
     async def gif(self, ctx, *, search_term):

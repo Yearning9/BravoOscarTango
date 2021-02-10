@@ -4,12 +4,7 @@ import discord
 import json
 import os
 from staticmap import StaticMap, CircleMarker, IconMarker
-
-def guild_prefix(client, message):
-    with open('Private/prefixes.json', 'r') as f:
-        prefixes = json.load(f)
-
-    return prefixes[str(message.guild.id)]
+# from WonderfulBot import guild_prefix
 
 
 prfx = '.'
@@ -36,13 +31,17 @@ class FlightSim(commands.Cog):
         self.client = client
 
     @commands.command(aliases=["wx"])
+    @commands.cooldown(1, 3)
     async def metar(self, ctx, icao: str):
 
+        global gustbool
         if len(icao) != 4:
             await ctx.reply("ICAO code must be composed of 4 characters", mention_author=False)
             return
 
+
         req = requests.get('https://api.checkwx.com/metar/{}/decoded'.format(icao), headers=hdr)
+
 
         print(f"Requested METAR for {icao.upper()}")
 
@@ -59,14 +58,26 @@ class FlightSim(commands.Cog):
             await ctx.send("No results, please check for typos or try a different ICAO")
             return
 
+        # with open('./Utils/wx.json', 'w') as f:
+        #     json.dump(resp, f, indent=4)
+
         layerint = len(resp["data"][0]["clouds"])  # integer for number of cloud layers
+
         wxint = len(resp["data"][0]["conditions"])  # presence of wx conditions
+
         visbool = "visibility" in resp["data"][0]  # presence of vis data
-        gustbool = "gust_kts" in resp["data"][0]["wind"]  # presence of gusts
+
+        if 'wind' in resp['data'][0]:
+            gustbool = "gust_kts" in resp["data"][0]["wind"]  # presence of gusts
+            wind_bool = True
+        else:
+            wind_bool = False
+
 
         name = resp["data"][0]["station"]["name"]
-        degrees = resp["data"][0]["wind"]["degrees"]
-        speed = resp["data"][0]["wind"]["speed_kts"]
+        if wind_bool:
+            degrees = resp["data"][0]["wind"]["degrees"]
+            speed = resp["data"][0]["wind"]["speed_kts"]
         temp = resp["data"][0]["temperature"]["celsius"]
         dew = resp["data"][0]["dewpoint"]["celsius"]
         humidity = resp["data"][0]["humidity"]["percent"]
@@ -96,22 +107,30 @@ class FlightSim(commands.Cog):
         image.save('Utils/metar.png')
         file = discord.File('Utils/metar.png')
 
+
+
         metar = discord.Embed(
-            title="Requested METAR for {} - {}".format(icao, name),
+            title="Requested METAR for {} - {}".format(icao.upper(), name),
             description="Raw: {}".format(raw),
             colour=discord.Colour.from_rgb(97, 0, 215)
         )
-        if not gustbool:
-            metar.add_field(name="Wind:", value="{}° at {} kts".format(degrees, speed))
+        if wind_bool:
+            if not gustbool:
+                metar.add_field(name="Wind:", value="{}° at {} kts".format(degrees, speed))
+            else:
+                gust = resp["data"][0]["wind"]["gust_kts"]
+                metar.add_field(name="Wind:", value="{}° at {} kts, gusts {} kts".format(degrees, speed, gust))
         else:
-            gust = resp["data"][0]["wind"]["gust_kts"]
-            metar.add_field(name="Wind:", value="{}° at {} kts, gusts {} kts".format(degrees, speed, gust))
+            metar.add_field(name="Wind:", value="Calm")
+
         metar.add_field(name="Temp/Dewpoint:", value="{}°C/ {}°C".format(temp, dew))
         metar.add_field(name="Altimeter:", value="{} hPa/ {} inHg".format(hpa, inhg))
         if visbool:
             vismil = resp["data"][0]["visibility"]["miles"]
             vismet = resp["data"][0]["visibility"]["meters"]
             metar.add_field(name="Visibility:", value="{} meters/ {} miles".format(vismet, vismil))
+
+
         metar.add_field(name="Humidity:", value="{}%".format(humidity))
         metar.set_thumbnail(
             url="https://cdn.discordapp.com/attachments/651086904925749252/802617703809548298/ezgif.com-gif-maker_3.gif")
@@ -120,10 +139,14 @@ class FlightSim(commands.Cog):
             weather = resp["data"][0]["conditions"][0]["text"]
             metar.add_field(name="Weather condition:", value="{}".format(weather))
 
+
         if layerint == 1:
             clouds = resp["data"][0]["clouds"][0]["text"]
-            clofeet = resp["data"][0]["clouds"][0]["feet"]
-            metar.add_field(name="Cloud condition:", value="{}ft {}".format(clofeet, clouds))
+            if 'feet' in resp["data"][0]["clouds"][0]:
+                clofeet = resp["data"][0]["clouds"][0]["feet"]
+                metar.add_field(name="Cloud condition:", value="{}ft {}".format(clofeet, clouds))
+            else:
+                metar.add_field(name="Cloud condition:", value="{}".format(clouds))
         elif layerint == 2:
             clouds = resp["data"][0]["clouds"][0]["text"]
             clofeet = resp["data"][0]["clouds"][0]["feet"]
@@ -141,8 +164,8 @@ class FlightSim(commands.Cog):
             metar.add_field(name="Cloud condition:",
                             value="{}ft {}/ {}ft {}/ {}ft {}".format(clofeet, clouds, clofeet1, clouds1, clofeet2,
                                                                      clouds2))
-        elif layerint == 0:
-            metar.add_field(name="Cloud condition:", value="None/ Not Specified")
+        else:
+            metar.add_field(name="Cloud condition:", value="Not Specified / Cloud data error")
 
         metar.set_image(url='attachment://metar.png')
 
@@ -199,7 +222,7 @@ class FlightSim(commands.Cog):
                 mention_author=False)
 
     @commands.command(aliases=['fl', 'flp', 'fltplan'])
-    @commands.cooldown(1, 60)
+    @commands.cooldown(1, 10)
     async def flightplan(self, ctx, dep='lmfao', arr='lmfao'):
 
         if dep == 'lmfao' or arr == 'lmfao':
@@ -327,7 +350,7 @@ class FlightSim(commands.Cog):
         flp_embed.add_field(name='Arrival Airport:', value=arr_name)
         flp_embed.add_field(name='Distance / Cruise Altitude:', value=f'{dist}nm/{cr_alt}ft')
         flp_embed.add_field(name='Link to full flight plan:', value=link)
-        flp_embed.set_footer(text=f'Using data from the Flight Plan Database (https://flightplandatabase.com), AIRAC Cycle: **{airac[3:]}**, download the flight plan with {prfx}download')
+        flp_embed.set_footer(text=f'Using data from the Flight Plan Database (https://flightplandatabase.com), AIRAC Cycle: {airac[3:]}, download the flight plan with {prfx}download')
 
         await message1.delete()
         await ctx.send(embed=flp_embed)
@@ -354,6 +377,11 @@ class FlightSim(commands.Cog):
     async def flp_error(self, ctx, error):
         if isinstance(error, discord.ext.commands.CommandOnCooldown):
             await ctx.reply('Command on cooldown, please wait a few seconds or wait for the current request to be processed', mention_author=False, delete_after=10)
+
+    @metar.error
+    async def metar_error(self, ctx, error):
+        if isinstance(error, discord.ext.commands.CommandOnCooldown):
+            await ctx.reply('Command on cooldown, please wait a few seconds or wait for the current request to be processed', mention_author=False, delete_after=5)
 
 def setup(client):
     client.add_cog(FlightSim(client))

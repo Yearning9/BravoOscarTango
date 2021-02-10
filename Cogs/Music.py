@@ -8,22 +8,18 @@ import discord
 import youtube_dl
 from async_timeout import timeout
 from discord.ext import commands
-import json
+# from WonderfulBot import guild_prefix
+# import json
 
 genius = lyricsgenius.Genius("r_eahP4j5tNj34CGAI48kSVYCHyJ0YCCDG70kmmHrVnYElyuqjnULP0lk9tvxKlT")
 
 sauce = ''
 
+looped = False
+
 youtube_dl.utils.bug_reports_message = lambda: ''
 
-def guild_prefix(client, message):
-    with open('Private/prefixes.json', 'r') as f:
-        prefixes = json.load(f)
-
-    return prefixes[str(message.guild.id)]
-
-
-prfx = guild_prefix
+prfx = '.'
 
 class VoiceError(Exception):
     pass
@@ -409,9 +405,15 @@ class Music(commands.Cog):
         if not ctx.voice_state.is_playing:
             return await ctx.reply('Nothing being played at the moment', mention_author=False)
 
+        global looped
         # Inverse boolean value to loop and unloop.
         ctx.voice_state.loop = not ctx.voice_state.loop
-        await ctx.reply('Song has been looped/unlooped :repeat_one:', mention_author=False)
+        looped = not looped
+        if looped:
+            return await ctx.reply('Song has been looped :repeat_one:', mention_author=False)
+        else:
+            return await ctx.reply('Song has been unlooped :repeat_one:', mention_author=False)
+
 
     @commands.command(aliases=['p', 'play'])
     async def _play(self, ctx: commands.Context, *, search: str):
