@@ -10,18 +10,15 @@ from discord.ext.commands import MissingRequiredArgument
 # dictionary of afk users
 afkdict = {}
 
-proing = ''
 
-def guild_prefix(client, message):
-    global proing
+def get_prefix(client, message):
     with open('Private/prefixes.json', 'r') as f:
         prefixes = json.load(f)
-    proing = prefixes[str(message.guild.id)]
 
     return prefixes[str(message.guild.id)]
 
 
-client = commands.Bot(command_prefix=guild_prefix)
+client = commands.Bot(command_prefix=get_prefix)
 
 # remove default help command because I don't like it
 client.remove_command("help")
@@ -41,12 +38,12 @@ prfx = '.'
 @client.event
 async def on_ready():
     await client.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.competing, name='flight simming (.commands)'))
+        activity=discord.Activity(type=discord.ActivityType.competing, name='retard championship (.commands)'))
     print('Bot is ready')
 
 
 @client.event
-async def prefix_join_guild(guild):
+async def on_guild_join(guild):
     with open('Private/prefixes.json', 'r') as f:
         prefixes = json.load(f)
 
@@ -57,7 +54,7 @@ async def prefix_join_guild(guild):
 
 
 @client.event
-async def prefix_leave_guild(guild):
+async def on_guild_remove(guild):
     with open('Private/prefixes.json', 'r') as f:
         prefixes = json.load(f)
 
@@ -67,7 +64,7 @@ async def prefix_leave_guild(guild):
         json.dump(prefixes, f, indent=4)
 
 
-@client.command()
+@client.command(aliases=['changeprefix'])
 @commands.has_permissions(administrator=True)
 async def prefix(ctx, new_prefix):
     if len(new_prefix) > 2:
@@ -88,11 +85,6 @@ async def prefix(ctx, new_prefix):
 @client.command()
 @commands.is_owner()
 async def test(ctx):
-    global proing
-    with open('Private/prefixes.json', 'r') as f:
-        prefixes = json.load(f)
-    proing = prefixes[str(ctx.guild.id)]
-    print(proing)
     await ctx.send(f'Startup check succesful, check console for ping, commands on {prfx}commands')
     print(f'{round(client.latency * 1000)} ms')
 
@@ -132,23 +124,23 @@ async def afk(ctx):
 
 @client.command()
 async def invite(ctx):
-    await ctx.reply('Invite for BravoOscarTango: https://discord.com/api/oauth2/authorize?client_id=728998963054903388&permissions=0&scope=bot')
+    await ctx.reply('Invite for WonderfulBot: https://discord.com/api/oauth2/authorize?client_id=728998963054903388&permissions=0&scope=bot')
 
-@client.event
-async def on_message(message):
-    global afkdict
-    user = client.get_user(message.author.id)
-    if message.content == "balls 🗿" or message.content == "Balls 🗿":
-        await message.channel.send("<:sad:776437812865007616>")
-    if message.author in afkdict:
-        afkdict.pop(message.author)
-        await user.send('You are no longer AFK')
-    for member in message.mentions:
-        if member != message.author:
-            if member in afkdict:
-                await user.send(f"{member} is AFK")
-
-    await client.process_commands(message)
+# @client.event
+# async def on_message(message):
+#     global afkdict
+#     user = client.get_user(message.author.id)
+#     if message.content == "balls 🗿" or message.content == "Balls 🗿":
+#         await message.channel.send("<:sad:776437812865007616>")
+#     if message.author in afkdict:
+#         afkdict.pop(message.author)
+#         await user.send('You are no longer AFK')
+#     for member in message.mentions:
+#         if member != message.author:
+#             if member in afkdict:
+#                 await user.send(f"{member} is AFK")
+#
+#     await client.process_commands(message)
 
 
 for filename in os.listdir('./Cogs'):
