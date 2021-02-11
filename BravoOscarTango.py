@@ -126,21 +126,21 @@ async def afk(ctx):
 async def invite(ctx):
     await ctx.reply('Invite for WonderfulBot: https://discord.com/api/oauth2/authorize?client_id=728998963054903388&permissions=0&scope=bot')
 
-# @client.event
-# async def on_message(message):
-#     global afkdict
-#     user = client.get_user(message.author.id)
-#     if message.content == "balls 🗿" or message.content == "Balls 🗿":
-#         await message.channel.send("<:sad:776437812865007616>")
-#     if message.author in afkdict:
-#         afkdict.pop(message.author)
-#         await user.send('You are no longer AFK')
-#     for member in message.mentions:
-#         if member != message.author:
-#             if member in afkdict:
-#                 await user.send(f"{member} is AFK")
-#
-#     await client.process_commands(message)
+@client.event
+async def on_message(message):
+    global afkdict
+    user = client.get_user(message.author.id)
+    if message.content == "balls 🗿" or message.content == "Balls 🗿":
+        await message.channel.send("<:sad:776437812865007616>")
+    if message.author in afkdict:
+        afkdict.pop(message.author)
+        await user.send('You are no longer AFK')
+    for member in message.mentions:
+        if member != message.author:
+            if member in afkdict:
+                await user.send(f"{member} is AFK")
+
+    await client.process_commands(message)
 
 
 for filename in os.listdir('./Cogs'):
