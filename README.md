@@ -9,4 +9,4 @@ With this bot you can:
 - Download up-to-date charts
 - And much more!
 
-Invite: https://discord.com/api/oauth2/authorize?client_id=728998963054903388&permissions=0&scope=bot
+Invite: https://discord.com/oauth2/authorize?client_id=728998963054903388&permissions=280291398&scope=bot
