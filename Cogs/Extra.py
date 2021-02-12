@@ -16,7 +16,6 @@ class Extra(commands.Cog):
             colour=discord.Colour.from_rgb(97, 0, 215)
         )
 
-        embed.set_footer(text=f'To see other commands use {prfx}commands')
         embed.set_thumbnail(
             url='https://cdn.discordapp.com/attachments/356779184393158657/729351510974267513/plane-travel-icon-rebound2.gif')
         embed.add_field(name=f'{prfx}flightcommands :airplane_departure:', value='List of flight sim commands', inline=False),
@@ -26,6 +25,7 @@ class Extra(commands.Cog):
         embed.add_field(name=f'{prfx}funcommands :beach_umbrella:', value='List of fun commands', inline=False),
         embed.add_field(name=f'{prfx}extracommands :unlock:', value='List of extra commands', inline=False),
         embed.add_field(name=f'{prfx}invite :incoming_envelope:', value='Bot invite', inline=False)
+        embed.add_field(name=f'{prfx}feedback :card_box:', value='Provide feedback', inline=False)
 
 
         await ctx.reply(embed=embed, mention_author=False)
@@ -40,9 +40,9 @@ class Extra(commands.Cog):
         embed.set_footer(text=f'To see other commands use {prfx}commands')
         embed.set_thumbnail(
             url='https://cdn.discordapp.com/attachments/356779184393158657/729351510974267513/plane-travel-icon-rebound2.gif')
-        # embed.add_field(name=f'{prfx}vuling', value='To pray for our eternal god', inline=False)
-        # embed.add_field(name=f'{prfx}colonialism', value='Very unbiased command', inline=False)
-        # embed.add_field(name=f'{prfx}md11', value='Another very unbiased command', inline=False)
+        embed.add_field(name=f'{prfx}vuling', value='To pray for our eternal god', inline=False)
+        embed.add_field(name=f'{prfx}colonialism', value='Very unbiased command', inline=False)
+        embed.add_field(name=f'{prfx}md11', value='Another very unbiased command', inline=False)
         embed.add_field(name=f'{prfx}zalgo ({prfx}z)', value='Translates text to zalgo, not effective for long sentences', inline=False)
         embed.add_field(name=f'{prfx}markov ({prfx}mk)', value='Generates a sentence based on a txt file, in this case the Communist Manifesto :)', inline=False)
         embed.add_field(name=f'{prfx}garloc',
@@ -54,7 +54,7 @@ class Extra(commands.Cog):
     async def modcommands(self, ctx):
         embed = discord.Embed(
             title='List of mod commands',
-            description='All of these need mod/admin permissions',
+            description='All of these need mod permissions',
             colour=discord.Colour.from_rgb(97, 0, 215)
         )
 
@@ -67,7 +67,6 @@ class Extra(commands.Cog):
         embed.add_field(name=f'{prfx}kick [member][reason]', value='To kick a member, default reason is None', inline=False)
         embed.add_field(name=f'{prfx}mute [member][reason]', value='To mute a member, default reason is None', inline=False)
         embed.add_field(name=f'{prfx}unmute [member]', value='To unmute a muted member', inline=False)
-        embed.add_field(name=f'{prfx}changeprefix [prefix]', value="Change the bot's prefix", inline=False)
         await ctx.reply(embed=embed, mention_author=False)
 
     @commands.command()
