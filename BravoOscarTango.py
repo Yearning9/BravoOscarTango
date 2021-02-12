@@ -2,13 +2,11 @@ import discord
 import os
 import json
 from discord.ext import commands
-from discord.ext.commands import NotOwner
-from discord.ext.commands import CommandNotFound
-from discord.ext.commands import MissingPermissions
-from discord.ext.commands import MissingRequiredArgument
+from discord.ext.commands import NotOwner, CommandNotFound, MissingPermissions, MissingRequiredArgument
 
 # dictionary of afk users
 afkdict = {}
+
 
 
 def get_prefix(client, message):
@@ -40,7 +38,6 @@ async def on_ready():
     await client.change_presence(
         activity=discord.Activity(type=discord.ActivityType.competing, name='flight simming (.commands)'))
     print('Bot is ready')
-
 
 @client.event
 async def on_guild_join(guild):
@@ -141,6 +138,11 @@ async def on_message(message):
                 await user.send(f"{member} is AFK")
 
     await client.process_commands(message)
+
+@client.command(aliases=['fb'])
+async def feedback(ctx):
+    await ctx.reply('Thank you for wanting to provide feedback! Please fill in the short form at https://bravooscartangofb.herokuapp.com', mention_author=False)
+
 
 
 for filename in os.listdir('./Cogs'):
