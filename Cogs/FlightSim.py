@@ -4,10 +4,8 @@ import discord
 import json
 import os
 from staticmap import StaticMap, CircleMarker, IconMarker
-# from WonderfulBot import guild_prefix
+from BravoOscarTango import get_prefix
 
-
-prfx = '.'
 
 avail_checklists = []
 for checklists in os.listdir('./Utils/Checklists'):
@@ -174,6 +172,8 @@ class FlightSim(commands.Cog):
     @commands.command(aliases=["chart", "ch"])
     async def charts(self, ctx, icao1: str):
 
+        prfx = get_prefix(client=self, message=ctx.message)
+
         with ctx.typing():
             print(f"Requested charts for {icao1.upper()}")
 
@@ -204,6 +204,8 @@ class FlightSim(commands.Cog):
     @commands.command(aliases=["cl"])
     async def checklist(self, ctx, plane='avail'):
 
+        prfx = get_prefix(client=self, message=ctx.message)
+
         if plane == 'avail':
             avplanes = ', '.join(avail_checklists)
             await ctx.reply(f'Checklists are currenly available for these planes: **{avplanes}**', mention_author=False)
@@ -218,12 +220,14 @@ class FlightSim(commands.Cog):
                             mention_author=False)
         else:
             await ctx.reply(
-                "Unfortunately the checklist you requested is not available, check a list of available checklists with .cl",
+                f"Unfortunately the checklist you requested is not available, check a list of available checklists with {prfx}cl",
                 mention_author=False)
 
     @commands.command(aliases=['fl', 'flp', 'fltplan'])
     @commands.cooldown(1, 10)
     async def flightplan(self, ctx, dep='lmfao', arr='lmfao'):
+
+        prfx = get_prefix(client=self, message=ctx.message)
 
         if dep == 'lmfao' or arr == 'lmfao':
             await ctx.send('You need to specify two valid airport ICAO codes to create a flight plan')
@@ -310,11 +314,9 @@ class FlightSim(commands.Cog):
                     i += 1
                     continue
                 elif flp['route']['nodes'][i]['via'] is None:
-                    print(flp['route']['nodes'][i]['ident'])
                     del flp['route']['nodes'][i]['via']
                     flp['route']['nodes'][i]['via'] = {}
                     flp['route']['nodes'][i]['via']['ident'] = 'None'
-                    print(flp['route']['nodes'][i]['via']['ident'])
                     if i != 1:
                         if flp['route']['nodes'][i-1]['via']['ident'] == 'None':
                             route += ' ' + '**DCT**' + ' ' + flp['route']['nodes'][i]['ident']
@@ -325,7 +327,6 @@ class FlightSim(commands.Cog):
                     i += 1
                     continue
                 elif flp['route']['nodes'][i]['via']['ident'] != flp['route']['nodes'][i-1]['via']['ident']:
-                    print(flp['route']['nodes'][i]['via']['ident'])
                     if flp['route']['nodes'][i-1]['via']['ident'] == 'None':
                         route += ' ' + '**DCT**' + ' ' + flp['route']['nodes'][i]['ident'] + ' ' + '**' + flp['route']['nodes'][i]['via']['ident'] + '**'
                     else:
@@ -339,7 +340,6 @@ class FlightSim(commands.Cog):
                 route += f'***{arr_icao}***'
                 break
 
-        print(route)
 
         flp_embed = discord.Embed(
             title=f"Here's your flight plan: **{dep_icao} → {arr_icao}**",
@@ -352,15 +352,19 @@ class FlightSim(commands.Cog):
         flp_embed.add_field(name='Link to full flight plan:', value=link)
         flp_embed.set_footer(text=f'Using data from the Flight Plan Database (https://flightplandatabase.com), AIRAC Cycle: {airac[3:]}, download the flight plan with {prfx}download')
 
+        print('Success!')
         await message1.delete()
         await ctx.send(embed=flp_embed)
 
     @commands.command()
     async def download(self, ctx, sim_type='None'):
+
+        prfx = get_prefix(client=self, message=ctx.message)
+
         if fltplan_id == 0:
             await ctx.reply(f'You need to first create a flight plan with {prfx}flightplan', mention_author=False)
             return
-        elif sim_type not in correct_sim_types:
+        elif sim_type.lower() not in correct_sim_types:
             await ctx.reply('You need to specify a correct file format, supported formats are: xplane11 [X-Plane 11], xplane [X-Plane 10], fsx [FSX], fs9 [FS2004], pmdg [PMDG], pdf [PDF]', mention_author=False)
             return
         else:

@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
-# from WonderfulBot import guild_prefix
+from BravoOscarTango import get_prefix
 
-prfx = '.'
 
 class Extra(commands.Cog):
 
@@ -11,6 +10,7 @@ class Extra(commands.Cog):
 
     @commands.command(aliases=['commands'])
     async def help(self, ctx):
+        prfx = get_prefix(client=self, message=ctx.message)
         embed = discord.Embed(
             title='***List of commands***',
             colour=discord.Colour.from_rgb(97, 0, 215)
@@ -32,6 +32,7 @@ class Extra(commands.Cog):
 
     @commands.command()
     async def funcommands(self, ctx):
+        prfx = get_prefix(client=self, message=ctx.message)
         embed = discord.Embed(
             title='***List of commands***',
             colour=discord.Colour.from_rgb(97, 0, 215)
@@ -40,11 +41,11 @@ class Extra(commands.Cog):
         embed.set_footer(text=f'To see other commands use {prfx}commands')
         embed.set_thumbnail(
             url='https://cdn.discordapp.com/attachments/356779184393158657/729351510974267513/plane-travel-icon-rebound2.gif')
-        embed.add_field(name=f'{prfx}vuling', value='To pray for our eternal god', inline=False)
-        embed.add_field(name=f'{prfx}colonialism', value='Very unbiased command', inline=False)
-        embed.add_field(name=f'{prfx}md11', value='Another very unbiased command', inline=False)
+        # embed.add_field(name=f'{prfx}vuling', value='To pray for our eternal god', inline=False)
+        # embed.add_field(name=f'{prfx}colonialism', value='Very unbiased command', inline=False)
+        # embed.add_field(name=f'{prfx}md11', value='Another very unbiased command', inline=False)
         embed.add_field(name=f'{prfx}zalgo ({prfx}z)', value='Translates text to zalgo, not effective for long sentences', inline=False)
-        embed.add_field(name=f'{prfx}markov ({prfx}mk)', value='Generates a sentence based on a txt file, in this case the Communist Manifesto :)', inline=False)
+        embed.add_field(name=f'{prfx}markov ({prfx}mk)', value='Generates a sentence based on the Communist Manifesto :)', inline=False)
         embed.add_field(name=f'{prfx}garloc',
                         value='Õ̷̗h̶̰̀ ̶̭̋m̷̥͌a̶̺͂n̷͓̊ ̵̫̒p̴̹͐ḻ̸̑s̷͈̋ ̷͍̾h̵̹̓e̴̻̽l̵̈́͜p̸̝̽ ̴̗̄w̷͇̐ĩ̸͇t̸͖̐h̸̗̀ ̴̜̀c̵̤̾o̷̢̚ṃ̴͝p̶̜̓u̵͜͠t̷̓͜e̷̗͆ŕ̶̩',
                         inline=False)
@@ -52,6 +53,7 @@ class Extra(commands.Cog):
 
     @commands.command()
     async def modcommands(self, ctx):
+        prfx = get_prefix(client=self, message=ctx.message)
         embed = discord.Embed(
             title='List of mod commands',
             description='All of these need mod permissions',
@@ -67,10 +69,12 @@ class Extra(commands.Cog):
         embed.add_field(name=f'{prfx}kick [member][reason]', value='To kick a member, default reason is None', inline=False)
         embed.add_field(name=f'{prfx}mute [member][reason]', value='To mute a member, default reason is None', inline=False)
         embed.add_field(name=f'{prfx}unmute [member]', value='To unmute a muted member', inline=False)
+        embed.add_field(name=f'{prfx}changeprefix [new prefix]', value='To change the bot prefix', inline=False)
         await ctx.reply(embed=embed, mention_author=False)
 
     @commands.command()
     async def music(self, ctx):
+        prfx = get_prefix(client=self, message=ctx.message)
         embed = discord.Embed(
             title='***List of music commands***',
             colour=discord.Colour.from_rgb(97, 0, 215)
@@ -100,6 +104,7 @@ class Extra(commands.Cog):
 
     @commands.command()
     async def flightcommands(self, ctx):
+        prfx = get_prefix(client=self, message=ctx.message)
         embed = discord.Embed(
             title='List of flight sim commands',
             colour=discord.Colour.from_rgb(97, 0, 215)
@@ -117,6 +122,7 @@ class Extra(commands.Cog):
 
     @commands.command()
     async def extracommands(self, ctx):
+        prfx = get_prefix(client=self, message=ctx.message)
         embed = discord.Embed(
             title='List of extra commands',
             colour=discord.Colour.from_rgb(97, 0, 215)
@@ -130,9 +136,9 @@ class Extra(commands.Cog):
                         inline=False)
         embed.add_field(name=f'{prfx}gif ({prfx}g) [GIF search query]',
                         value='[Tenor] Searches and posts a GIF based on the given query', inline=False)
-        embed.add_field(name=f'{prfx}afk',
-                        value="You'll be set as AFK, if someone tags you while AFK they'll be notified about it. Use again or send a message to remove AFK status",
-                        inline=False)
+        # embed.add_field(name=f'{prfx}afk',
+        #                 value="You'll be set as AFK, if someone tags you while AFK they'll be notified about it. Use again or send a message to remove AFK status",
+        #                 inline=False)
         embed.add_field(name=f'{prfx}pic [Image search query]',
                         value="[Google Images] Searches and posts a picture based on the given query", inline=False)
         await ctx.reply(embed=embed, mention_author=False)
