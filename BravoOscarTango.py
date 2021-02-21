@@ -1,26 +1,34 @@
 import discord
 import os
-import json
 from discord.ext import commands
-from discord.ext.commands import NotOwner, CommandNotFound, MissingPermissions, MissingRequiredArgument
+from discord.ext.commands import NotOwner, CommandNotFound
+from Cogs.Prefixes import db, PrefixDatabase
+from discord_slash import SlashCommand, manage_commands
 
 # dictionary of afk users
-afkdict = {}
-
+# afkdict = {}
 
 
 def get_prefix(client, message):
-    with open('Private/prefixes.json', 'r') as f:
-        prefixes = json.load(f)
+    try:
+        guild_prefix = db.session.query(PrefixDatabase).filter_by(id_guild=str(message.guild.id)).first()
+        return str(guild_prefix.prefix)
+    except AttributeError:
+        prefix = '.'
+        data = PrefixDatabase(str(message.guild.id), prefix)
+        db.session.add(data)
+        db.session.commit()
+        print(f'Added {str(message.guild.id)}')
+        return '.'
 
-    return prefixes[str(message.guild.id)]
 
-
-client = commands.Bot(command_prefix=get_prefix)
+client = commands.Bot(command_prefix=get_prefix, intents=discord.Intents.all())
+# client = commands.Bot(command_prefix='.')  # let's call this an emergency measure for prefixes
 
 # remove default help command because I don't like it
 client.remove_command("help")
 
+slash = SlashCommand(client, sync_commands=True, override_type=True)
 
 def guild_id(ctx):
     with open('Private/DiscordServer.txt', 'r')as f:
@@ -31,7 +39,6 @@ def guild_id(ctx):
 with open('Private/Discord.txt', 'r') as g:
     token: str = g.read()
 
-prfx = '.'
 
 @client.event
 async def on_ready():
@@ -39,55 +46,32 @@ async def on_ready():
         activity=discord.Activity(type=discord.ActivityType.competing, name='flight simming (.commands)'))
     print('Bot is ready')
 
+
 @client.event
 async def on_guild_join(guild):
-    with open('Private/prefixes.json', 'r') as f:
-        prefixes = json.load(f)
-
-    prefixes[str(guild.id)] = '.'
-
-    with open('Private/prefixes.json', 'w') as f:
-        json.dump(prefixes, f, indent=4)
-
-
-@client.event
-async def on_guild_remove(guild):
-    with open('Private/prefixes.json', 'r') as f:
-        prefixes = json.load(f)
-
-    prefixes.pop(str(guild.id))
-
-    with open('Private/prefixes.json', 'w') as f:
-        json.dump(prefixes, f, indent=4)
-
-
-@client.command(aliases=['changeprefix'])
-@commands.has_permissions(administrator=True)
-async def prefix(ctx, new_prefix):
-    if len(new_prefix) > 2:
-        ctx.reply("Please use a max of 2 characters")
-        return
-
-    with open('Private/prefixes.json', 'r') as f:
-        prefixes = json.load(f)
-
-    prefixes[str(ctx.guild.id)] = new_prefix
-
-    with open('Private/prefixes.json', 'w') as f:
-        json.dump(prefixes, f, indent=4)
-
-    await ctx.reply(f'Bot prefix set to: {new_prefix}', mention_author=False)
+    if db.session.query(PrefixDatabase).filter(PrefixDatabase.id_guild == str(guild.id)).count() == 0:
+        prefix = '.'
+        data = PrefixDatabase(str(guild.id), prefix)
+        db.session.add(data)
+        db.session.commit()
+        print(f'Added {str(guild.id)}')
+    else:
+        guild_db = db.session.query(PrefixDatabase).filter_by(id_guild=str(guild.id)).first()
+        guild_db.prefix = '.'
+        db.session.commit()
 
 
 @client.command()
 @commands.is_owner()
 async def test(ctx):
+    prfx = get_prefix(client, message=ctx.message)
     await ctx.send(f'Startup check succesful, check console for ping, commands on {prfx}commands')
     print(f'{round(client.latency * 1000)} ms')
 
 
 @client.event
 async def on_command_error(ctx, error):
+    prfx = get_prefix(client, message=ctx.message)
     if isinstance(error, CommandNotFound):
         await ctx.send(f'Command does not exist, check {prfx}commands or {prfx}modcommands for a list of commands')
 
@@ -98,30 +82,25 @@ async def test_error(ctx, error):
         await ctx.send("This command is only intended for use by owner")
 
 
-@prefix.error
-async def prefix_error(ctx, error):
-    if isinstance(error, MissingPermissions):
-        await ctx.send('You have to be a server admin to change the prefix')
-    if isinstance(error, MissingRequiredArgument):
-        await ctx.send('Please specify a prefix')
+# @client.command()
+# async def afk(ctx):
+#     global afkdict
+#     user = client.get_user(ctx.message.author.id)
+#     if ctx.message.author in afkdict:
+#         afkdict.pop(ctx.message.author)
+#         await ctx.channel.purge(limit=1)
+#         await user.send('You are no longer AFK')
+#     else:
+#         afkdict[ctx.message.author] = ctx.message.author.id
+#         await ctx.channel.purge(limit=1)
+#         await user.send(f"You are now AFK in {ctx.guild}")
 
-
-@client.command()
-async def afk(ctx):
-    global afkdict
-    user = client.get_user(ctx.message.author.id)
-    if ctx.message.author in afkdict:
-        afkdict.pop(ctx.message.author)
-        await ctx.channel.purge(limit=1)
-        await user.send('You are no longer AFK')
-    else:
-        afkdict[ctx.message.author] = ctx.message.author.id
-        await ctx.channel.purge(limit=1)
-        await user.send(f"You are now AFK in {ctx.guild}")
 
 @client.command()
 async def invite(ctx):
-    await ctx.reply('Invite for BravoOscarTango: https://discord.com/oauth2/authorize?client_id=728998963054903388&permissions=280291398&scope=bot')
+    await ctx.reply(
+        'Invite for BravoOscarTango: https://discord.com/api/oauth2/authorize?client_id=728998963054903388&permissions=271902726&scope=bot')
+
 
 @client.event
 async def on_message(message):
@@ -129,20 +108,22 @@ async def on_message(message):
     user = client.get_user(message.author.id)
     if message.content == "balls 🗿" or message.content == "Balls 🗿":
         await message.channel.send("<:sad:776437812865007616>")
-    if message.author in afkdict:
-        afkdict.pop(message.author)
-        await user.send('You are no longer AFK')
-    for member in message.mentions:
-        if member != message.author:
-            if member in afkdict:
-                await user.send(f"{member} is AFK")
+    # if message.author in afkdict:
+    #     afkdict.pop(message.author)
+    #     await user.send('You are no longer AFK')
+    # for member in message.mentions:
+    #     if member != message.author:
+    #         if member in afkdict:
+    #             await user.send(f"{member} is AFK")
 
     await client.process_commands(message)
 
+
 @client.command(aliases=['fb'])
 async def feedback(ctx):
-    await ctx.reply('Thank you for wanting to provide feedback! Please fill in the short form at https://bravooscartangofb.herokuapp.com', mention_author=False)
-
+    await ctx.reply(
+        'Thank you for wanting to provide feedback! Please fill in the short form at https://bravooscartangofb.herokuapp.com',
+        mention_author=False)
 
 
 for filename in os.listdir('./Cogs'):
