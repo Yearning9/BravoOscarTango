@@ -6,3 +6,8 @@ staticmap
 google_images_search
 markovbot
 zalgo_text
+Flask
+Flask-SQLAlchemy
+psycopg2
+psycopg2-binary
+discord_slash
