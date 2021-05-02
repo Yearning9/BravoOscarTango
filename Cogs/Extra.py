@@ -25,7 +25,8 @@ class Extra(commands.Cog):
         embed.add_field(name=f'{prfx}funcommands :beach_umbrella:', value='List of fun commands', inline=False),
         embed.add_field(name=f'{prfx}extracommands :unlock:', value='List of extra commands', inline=False),
         embed.add_field(name=f'{prfx}invite :incoming_envelope:', value='Bot invite', inline=False)
-        embed.add_field(name=f'{prfx}feedback :card_box:', value='Provide feedback', inline=False)
+        embed.add_field(name=f'{prfx}feedback/{prfx}support :card_box:', value='Provide feedback or ask for support', inline=False)
+        embed.add_field(name=f'{prfx}donate :heart:', value='Donate to the bot', inline=False)
 
 
         await ctx.reply(embed=embed, mention_author=False)
@@ -41,9 +42,6 @@ class Extra(commands.Cog):
         embed.set_footer(text=f'To see other commands use {prfx}commands')
         embed.set_thumbnail(
             url='https://cdn.discordapp.com/attachments/356779184393158657/729351510974267513/plane-travel-icon-rebound2.gif')
-        # embed.add_field(name=f'{prfx}vuling', value='To pray for our eternal god', inline=False)
-        # embed.add_field(name=f'{prfx}colonialism', value='Very unbiased command', inline=False)
-        # embed.add_field(name=f'{prfx}md11', value='Another very unbiased command', inline=False)
         embed.add_field(name=f'{prfx}zalgo ({prfx}z)', value='Translates text to zalgo, not effective for long sentences', inline=False)
         embed.add_field(name=f'{prfx}markov ({prfx}mk)', value='Generates a sentence based on the Communist Manifesto :)', inline=False)
         embed.add_field(name=f'{prfx}garloc',
@@ -117,7 +115,9 @@ class Extra(commands.Cog):
         embed.add_field(name=f'{prfx}charts ({prfx}ch) [ICAO]', value='Returns PDF chart for given airport ICAO', inline=False)
         embed.add_field(name=f'{prfx}checklist ({prfx}cl) [Aircraft ICAO]', value='Returns checklist for supported aircraft ICAO', inline=False)
         embed.add_field(name=f'{prfx}flightplan ({prfx}fl) [Departure ICAO][Arrival ICAO]', value='Calculates a flight plan between two given airports', inline=False)
-        embed.add_field(name=f'{prfx}download [File format]', value='Returns link to download FMS plan in the given format', inline=False)
+        embed.add_field(name=f'{prfx}simbrief ({prfx}sb) [Username]', value='Returns your last flight plan generated with SimBrief (WILL NOT GENERATE A FLIGHT PLAN, can be used in a private chat if you prefer to keep the username hidden)', inline=False)
+        embed.add_field(name=f'{prfx}info [ICAO]', value='Shows various info about a given airport ICAO', inline=False)
+        embed.add_field(name=f'{prfx}notam [ICAO] [Page]', value='Shows a list of NOTAMs for given airport ICAO, page number is optional', inline=False)
         await ctx.reply(embed=embed, mention_author=False)
 
     @commands.command()
@@ -136,11 +136,8 @@ class Extra(commands.Cog):
                         inline=False)
         embed.add_field(name=f'{prfx}gif ({prfx}g) [GIF search query]',
                         value='[Tenor] Searches and posts a GIF based on the given query', inline=False)
-        # embed.add_field(name=f'{prfx}afk',
-        #                 value="You'll be set as AFK, if someone tags you while AFK they'll be notified about it. Use again or send a message to remove AFK status",
-        #                 inline=False)
         embed.add_field(name=f'{prfx}pic [Image search query]',
-                        value="[Google Images] Searches and posts a picture based on the given query", inline=False)
+                        value="[Bing Images] Searches and posts a picture based on the given query", inline=False)
         await ctx.reply(embed=embed, mention_author=False)
 
 def setup(client):
