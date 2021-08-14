@@ -439,10 +439,15 @@ class FlightSim(commands.Cog):
                 metar = info['weather']['METAR']
                 taf = info['weather']['TAF']
 
-                offset = str(info['timezone']['offset'] / 3600)
+                offset1 = info['timezone']['offset'] / 3600
+
+                if offset1 == 1:
+                    offset1 = 0.0
+
+                offset = str(offset1)
                 offset = offset.replace('.', ':')
                 offset += '0'
-                if -10 < info['timezone']['offset'] / 3600 < 10:
+                if -10 < offset1 < 10:
                     if '-' not in offset:
                         offset = '+0' + offset
                     else:
@@ -463,7 +468,10 @@ class FlightSim(commands.Cog):
                 offset = "".join(offset)
 
                 epoch = datetime.datetime.utcnow().timestamp()
-                local = epoch + info['timezone']['offset']
+                if info['timezone']['offset'] != 3600:
+                    local = epoch + info['timezone']['offset']
+                else:
+                    local = epoch
                 utc = datetime.datetime.fromtimestamp(epoch).strftime('%d-%m-%Y %H:%M:%S')
                 local = datetime.datetime.fromtimestamp(local).strftime('%d-%m-%Y %H:%M:%S')
 
