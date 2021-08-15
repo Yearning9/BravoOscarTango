@@ -8,7 +8,6 @@ from staticmap import StaticMap, CircleMarker, IconMarker
 from PIL import Image, ImageDraw, ImageFont
 import datetime
 
-# from BravoOscarTango import get_prefix
 
 avail_checklists = []
 
@@ -424,6 +423,8 @@ class Slash(commands.Cog):
                            required=True)])
     @commands.command()
     async def info(self, ctx: SlashContext, icao: str = 'NO INPUT'):
+
+        await ctx.defer()
 
         if len(icao) != 4:
             await ctx.send("Please input a correct ICAO code")
