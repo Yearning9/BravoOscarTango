@@ -1,4 +1,4 @@
-# BravoOscarTango Discord Bot
+# BravoOscarTango Discord Bot [v1 - Deprecated]
 
 BravoOscarTango features a number of useful commands for flight simulation, as well as music commands, Covid19 data and some basic modding commands too!
 
