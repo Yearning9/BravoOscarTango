@@ -1,5 +1,7 @@
 # BravoOscarTango Discord Bot [v1 - Deprecated]
 
+v2 at https://github.com/Yearning9/BravoOscarTango-v2
+
 BravoOscarTango features a number of useful commands for flight simulation, as well as music commands, Covid19 data and some basic modding commands too!
 
 With this bot you can:
